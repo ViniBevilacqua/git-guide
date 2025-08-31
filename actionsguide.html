@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Actions Interactive Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Tailwind Slate with Indigo accent -->
+    <!-- Application Structure Plan: A single-page guide with a fixed top navigation for quick access to key sections. The content is organized into thematic sections, using static cards for core concepts and a step-by-step list for the workflow process. This structure is chosen to be clean, task-oriented, and easy to navigate for users learning a new technology. The interactive code example remains a key feature for hands-on learning. -->
+    <!-- Visualization & Content Choices: 
+        - Core Concepts: Report Info -> The fundamental components of Actions. Goal -> Inform & Organize. Viz/Method -> Static HTML/CSS cards. Interaction -> None (always open). Justification -> Presents foundational information upfront without requiring user interaction. Library -> N/A.
+        - How It Works: Report Info -> The process from trigger to execution. Goal -> Explain a Process. Viz/Method -> A horizontal flowchart built with styled HTML/CSS divs and flexbox. Justification -> Visually connects the abstract core concepts into a concrete process.
+        - Interactive Code Example: Report Info -> YAML syntax. Goal -> Explain code contextually. Viz/Method -> A code block with clickable spans that open a modal. Interaction -> Clicking opens a modal with a detailed explanation. Justification -> A modal avoids clipping issues and provides a focused reading experience for complex explanations.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+        .nav-link.active {
+            color: #4f46e5;
+            font-weight: 600;
+        }
+        .flow-step {
+            transition: background-color 0.3s, border-color 0.3s, transform 0.2s;
+        }
+        .flow-step:hover {
+            transform: translateY(-4px);
+            border-color: #4f46e5;
+        }
+        .code-highlight {
+            cursor: pointer;
+            background-color: rgba(79, 70, 229, 0.1);
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            padding: 2px 4px;
+            margin: -2px -4px;
+        }
+        .code-highlight:hover {
+            background-color: rgba(79, 70, 229, 0.2);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-indigo-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 inline-block -mt-1" fill="#4f46e5" viewBox="0 0 512 512" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3 .3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5 .3-6.2 2.3zm44.2-1.7c-2.9 .7-4.9 2.6-4.6 4.9 .3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM252.8 8c-138.7 0-244.8 105.3-244.8 244 0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1 100-33.2 167.8-128.1 167.8-239 0-138.7-112.5-244-251.2-244zM105.2 352.9c-1.3 1-1 3.3 .7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3 .3 2.9 2.3 3.9 1.6 1 3.6 .7 4.3-.7 .7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3 .7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3 .7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/>
+                        </svg>
+                        Actions Guide
+                    </span>
+                </div>
+                <nav class="hidden md:flex items-center space-x-4">
+                    <a href="#concepts" class="nav-link text-gray-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-md text-sm font-medium">Concepts</a>
+                    <a href="#how-it-works" class="nav-link text-gray-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-md text-sm font-medium">How It Works</a>
+                    <a href="#example" class="nav-link text-gray-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-md text-sm font-medium">Example</a>
+                    <a href="#advanced" class="nav-link text-gray-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-md text-sm font-medium">Advanced</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
+
+        <section id="intro" class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight">The Interactive GitHub Actions Guide</h1>
+            <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">An interactive guide to automating your builds, tests, and deployments directly from your GitHub repository.</p>
+        </section>
+
+        <section id="concepts" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 border-b-2 border-indigo-200 pb-2 mb-6">📜 Core Concepts</h2>
+            <p class="text-slate-600 mb-8">Understanding these fundamental concepts is key to using GitHub Actions effectively. They form the foundation of your automation workflows.</p>
+            <div id="concepts-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+        </section>
+
+        <section id="how-it-works" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 border-b-2 border-indigo-200 pb-2 mb-6">⚙️ The Flow of Automation</h2>
+             <p class="text-slate-600 mb-8">Now that you know the components, let's see how they connect. An event in your repository triggers a workflow, which runs jobs on a runner. Each job executes a series of steps to automate your tasks. Hover over a step below to see its description.</p>
+            <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+                <div class="flow-step p-4 border-2 border-slate-300 rounded-lg text-center bg-white cursor-pointer" data-description="An activity in your repository, like a push or pull request, that starts a workflow.">
+                    <span class="text-3xl">🛎️</span>
+                    <p class="font-semibold mt-2">Event</p>
+                </div>
+                <div class="text-3xl text-indigo-500 font-sans">→</div>
+                <div class="flow-step p-4 border-2 border-slate-300 rounded-lg text-center bg-white cursor-pointer" data-description="The automated process defined in a YAML file. It contains one or more jobs.">
+                    <span class="text-3xl">📜</span>
+                    <p class="font-semibold mt-2">Workflow</p>
+                </div>
+                <div class="text-3xl text-indigo-500 font-sans">→</div>
+                <div class="flow-step p-4 border-2 border-slate-300 rounded-lg text-center bg-white cursor-pointer" data-description="A server (provided by GitHub or self-hosted) that runs your workflow.">
+                    <span class="text-3xl">🖥️</span>
+                    <p class="font-semibold mt-2">Runner</p>
+                </div>
+                <div class="text-3xl text-indigo-500 font-sans">→</div>
+                <div class="flow-step p-4 border-2 border-slate-300 rounded-lg text-center bg-white cursor-pointer" data-description="A set of steps that execute on the same runner. Jobs run in parallel by default.">
+                    <span class="text-3xl">⚙️</span>
+                    <p class="font-semibold mt-2">Job</p>
+                </div>
+                 <div class="text-3xl text-indigo-500 font-sans">→</div>
+                <div class="flow-step p-4 border-2 border-slate-300 rounded-lg text-center bg-white cursor-pointer" data-description="An individual task. It can run shell commands or use a reusable 'action'.">
+                    <span class="text-3xl">➡️</span>
+                    <p class="font-semibold mt-2">Steps</p>
+                </div>
+            </div>
+            <div id="flow-description" class="mt-8 text-center text-lg text-slate-700 bg-white p-6 rounded-lg shadow-md min-h-[80px] flex items-center justify-center max-w-4xl mx-auto">
+                <p>Hover over a step in the flow to learn more about it.</p>
+            </div>
+        </section>
+
+        <section id="example" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 border-b-2 border-indigo-200 pb-2 mb-6">💻 Interactive Workflow Example</h2>
+            <p class="text-slate-600 mb-8">Workflows are defined in YAML files inside the <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">.github/workflows</code> directory. Click on the highlighted lines in this common Node.js CI workflow to see an explanation.</p>
+            <div class="bg-slate-800 text-white p-6 rounded-lg shadow-lg font-mono text-sm leading-relaxed max-w-4xl mx-auto">
+                <pre><code><span class="code-highlight" data-explanation="This is the file path. Workflows must be in the `.github/workflows` directory."><span class="text-green-400"># .github/workflows/ci.yml</span></span>
+
+<span class="code-highlight" data-explanation="The name of the workflow, which appears in the 'Actions' tab of your repository."><span class="text-yellow-400">name:</span> Node.js CI</span>
+
+<span class="code-highlight" data-explanation="This 'on' block defines the events that trigger the workflow. Here, it runs on any push or pull request to the 'main' branch."><span class="text-yellow-400">on:</span>
+  <span class="text-yellow-400">push:</span>
+    <span class="text-yellow-400">branches:</span> [ main ]
+  <span class="text-yellow-400">pull_request:</span>
+    <span class="text-yellow-400">branches:</span> [ main ]</span>
+
+<span class="code-highlight" data-explanation="Defines a job named 'build'. A workflow can have one or more jobs."><span class="text-yellow-400">jobs:</span>
+  <span class="text-yellow-400">build:</span></span>
+
+    <span class="code-highlight" data-explanation="Specifies the runner environment. This job will run on a fresh virtual machine running the latest version of Ubuntu, hosted by GitHub."><span class="text-yellow-400">runs-on:</span> ubuntu-latest</span>
+
+    <span class="code-highlight" data-explanation="A job contains a sequence of tasks called steps. They are executed in order."><span class="text-yellow-400">steps:</span></span>
+      <span class="code-highlight" data-explanation="The 'uses' keyword tells the job to run a pre-built, reusable action. This one checks out your repository's code onto the runner."><span class="text-cyan-400">- uses:</span> actions/checkout@v4</span>
+
+      <span class="code-highlight" data-explanation="This step uses another action to set up a specific version of Node.js on the runner. The 'with' keyword provides input parameters to the action."><span class="text-cyan-400">- name:</span> Setup Node.js
+        <span class="text-cyan-400">uses:</span> actions/setup-node@v4
+        <span class="text-cyan-400">with:</span>
+          <span class="text-yellow-400">node-version:</span> '20'</span>
+
+      <span class="code-highlight" data-explanation="The 'run' keyword executes a command-line command in the runner's shell. This step installs the project's dependencies."><span class="text-cyan-400">- name:</span> Install dependencies
+        <span class="text-cyan-400">run:</span> npm install</span>
+
+      <span class="code-highlight" data-explanation="This final step runs the project's test suite using the 'npm test' command. If this command fails, the entire workflow run will fail."><span class="text-cyan-400">- name:</span> Run tests
+        <span class="text-cyan-400">run:</span> npm test</span>
+</code></pre>
+            </div>
+        </section>
+
+        <section id="advanced" class="mb-16 scroll-mt-20">
+             <h2 class="text-3xl font-bold text-slate-800 border-b-2 border-indigo-200 pb-2 mb-6">✨ Advanced & Productivity Features</h2>
+             <p class="text-slate-600 mb-8">Master these tools to handle more complex scenarios, improve security, and speed up your workflows.</p>
+             <div class="grid lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md flex flex-col">
+                    <h3 class="text-xl font-semibold mb-2">Secrets Management</h3>
+                    <p class="text-slate-600">Store sensitive information like API keys or tokens as encrypted secrets in your repository settings. They can be used in your workflows via the <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">${{ secrets.YOUR_SECRET }}</code> context, without ever exposing them in your code.</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md flex flex-col">
+                    <h3 class="text-xl font-semibold mb-2">Deployment Environments</h3>
+                    <p class="text-slate-600">Define environments like 'staging' or 'production' with protection rules. This allows you to require manual approval from a specific team member before a deployment job can run, adding a crucial layer of security.</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md flex flex-col">
+                    <h3 class="text-xl font-semibold mb-2">Dependency Caching</h3>
+                    <p class="text-slate-600">Use the <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">actions/cache</code> action to speed up your workflows. It stores dependencies (like `node_modules`) so they don't need to be downloaded from scratch on every run, which can significantly reduce job execution time.</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md flex flex-col">
+                    <h3 class="text-xl font-semibold mb-2">Matrix Builds</h3>
+                    <p class="text-slate-600">Efficiently test your code across multiple versions of a language or on different operating systems. A matrix strategy creates a job for each configuration, allowing for comprehensive parallel testing with minimal code duplication.</p>
+                </div>
+             </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 mt-24">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-sm text-slate-500">
+            <p>Developed by <strong><a href="https://www.linkedin.com/in/vinicius-bevilacqua/"> Vinicius Bevilacqua</a></strong></p>
+        </div>
+    </footer>
+
+    <!-- Code Explanation Modal -->
+    <div id="code-explanation-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full flex flex-col max-h-[85vh]">
+            <div class="p-4 border-b flex justify-between items-center flex-shrink-0">
+                <h3 id="modal-title" class="text-lg font-mono text-indigo-600 bg-indigo-50 px-3 py-1 rounded-md"></h3>
+                <button id="close-modal-btn" class="text-slate-400 hover:text-slate-600 text-3xl font-light leading-none">&times;</button>
+            </div>
+            <div id="modal-content" class="p-6 overflow-y-auto text-slate-700 leading-relaxed"></div>
+        </div>
+    </div>
+    
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const concepts = [
+                { title: 'Workflows', description: 'An automated process defined in a YAML file. It is triggered by an event and can contain one or more jobs.' },
+                { title: 'Events', description: 'A specific activity in your repository that triggers a workflow run, like a push or pull request.' },
+                { title: 'Jobs', description: 'A set of steps that execute on the same runner. Jobs run in parallel by default.' },
+                { title: 'Steps', description: 'An individual task that can run commands or a reusable action. Steps are executed in order.' },
+                { title: 'Actions', description: 'A reusable, pre-built command from the GitHub Marketplace that simplifies your workflow.' },
+                { title: 'Runners', description: 'A server that runs your workflows. GitHub provides hosted runners, or you can host your own.' }
+            ];
+
+            const conceptsGrid = document.getElementById('concepts-grid');
+            concepts.forEach(concept => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow-md p-6';
+                card.innerHTML = `
+                    <h3 class="font-mono text-indigo-600 font-semibold mb-2">${concept.title}</h3>
+                    <p class="text-slate-600">${concept.description}</p>
+                `;
+                conceptsGrid.appendChild(card);
+            });
+
+            const flowSteps = document.querySelectorAll('.flow-step');
+            const flowDescription = document.getElementById('flow-description');
+            const initialFlowText = flowDescription.innerHTML;
+
+            flowSteps.forEach(step => {
+                step.addEventListener('mouseenter', () => {
+                    flowDescription.innerHTML = `<p>${step.dataset.description}</p>`;
+                });
+                step.addEventListener('mouseleave', () => {
+                    flowDescription.innerHTML = initialFlowText;
+                });
+            });
+
+            const codeHighlights = document.querySelectorAll('.code-highlight');
+            const modal = document.getElementById('code-explanation-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+
+            codeHighlights.forEach(highlight => {
+                highlight.addEventListener('click', () => {
+                    const explanation = highlight.dataset.explanation;
+                    const codeText = highlight.innerText.split('\n')[0];
+                    
+                    modalTitle.textContent = codeText;
+                    modalContent.textContent = explanation;
+                    modal.classList.remove('hidden');
+                });
+            });
+
+            const closeModal = () => modal.classList.add('hidden');
+            closeModalBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        document.querySelectorAll('.nav-link').forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+
+            document.querySelectorAll('main > section[id]').forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
+
