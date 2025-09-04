@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Git & GitHub Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Tailwind Slate with Indigo accent -->
+    <!-- Application Structure Plan: A single-page application with a fixed top navigation for quick jumps between sections (Setup, Concepts, Workflows, etc.). The core content is organized into interactive tabs and expandable 'command cards' to reduce cognitive load and encourage exploration. A search bar provides instant access to specific commands. This task-oriented, interactive structure is chosen over a linear document to better suit a developer's need for quick lookups and focused learning, making the guide a practical tool rather than just a document to be read. -->
+    <!-- Visualization & Content Choices: The guide's content is primarily text and code. Report Info: Lists of Git/GitHub commands and their descriptions. Goal: Organize and Inform. Viz/Presentation Method: Interactive lists where each command is a clickable item that expands to show details, examples, and a copy button. Justification: This approach is more engaging than static tables, reduces visual clutter, and provides a better UX for developers who need to quickly find and use a command. Report Info: Merge conflict resolution process. Goal: Explain a Process. Viz/Presentation Method: A step-by-step visual guide built with styled HTML/CSS divs and flexbox to illustrate the workflow. Justification: A visual diagram makes this complex, abstract process far more understandable than text alone. All interactions are powered by Vanilla JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+        .command-card-content {
+            display: none;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.3s ease-in-out;
+        }
+        .command-card.open .command-card-content {
+            display: block;
+            grid-template-rows: 1fr;
+        }
+        .nav-link.active {
+            color: #4f46e5;
+            font-weight: 600;
+        }
+        .tab.active {
+            border-color: #4f46e5;
+            color: #4f46e5;
+            background-color: #eef2ff;
+        }
+        .loader {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #ddd;
+            border-bottom-color: #4f46e5;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-indigo-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 inline-block -mt-1" fill="#4f46e5" viewBox="0 0 512 512" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3 .3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5 .3-6.2 2.3zm44.2-1.7c-2.9 .7-4.9 2.6-4.6 4.9 .3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM252.8 8c-138.7 0-244.8 105.3-244.8 244 0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1 100-33.2 167.8-128.1 167.8-239 0-138.7-112.5-244-251.2-244zM105.2 352.9c-1.3 1-1 3.3 .7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3 .3 2.9 2.3 3.9 1.6 1 3.6 .7 4.3-.7 .7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3 .7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3 .7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/>
+                        </svg>
+                        Git Guide
+                    </span>
+                </div>
+                <nav class="hidden md:flex items-center space-x-4">
+                    <a href="#setup" class="nav-link text-gray-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-md text-sm font-medium">Setup</a>
+                    <a href="#concepts" class="nav-link text-gray-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-md text-sm font-medium">Concepts</a>
+                    <a href="#workflow" class="nav-link text-gray-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-md text-sm font-medium">Workflows</a>
+                    <a href="#conflicts" class="nav-link text-gray-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-md text-sm font-medium">Conflicts</a>
+                    <a href="#advanced" class="nav-link text-gray-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-md text-sm font-medium">Advanced</a>
+                    <a href="#gemini-tools" class="nav-link text-gray-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-md text-sm font-medium">AI Tools</a>
+                    <a href="#multiple-accounts" class="nav-link text-gray-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-md text-sm font-medium">Multiple Accounts</a>
+                </nav>
+                 <div class="relative">
+                    <input type="search" id="searchInput" placeholder="Search commands..." class="w-40 md:w-64 px-4 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm" />
+                    <div id="searchResults" class="absolute top-full mt-2 w-full bg-white rounded-md shadow-lg z-10 hidden max-h-80 overflow-y-auto"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
+
+        <section id="intro" class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight">The Ultimate Interactive Git & GitHub Guide</h1>
+            <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">An interactive guide for a developer's complete workflow, now supercharged with AI tools powered by the Gemini API.</p>
+        </section>
+        
+        <div id="noResultsMessage" class="text-center py-8 text-slate-500 hidden">
+            <h3 class="text-xl font-semibold">No commands found</h3>
+            <p>Try a different search term.</p>
+        </div>
+
+        <section id="setup" class="mt-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 border-b-2 border-indigo-200 pb-2 mb-6">🚀 Initial Setup & Configuration</h2>
+            <p class="text-slate-600 mb-8">Before you start, you need to configure <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">git</code> with your identity and log <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">gh</code> into your GitHub account. This only needs to be done once per machine. This section will walk you through installing the tools and the essential first-time configuration.</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-3">Installing the Tools</h3>
+                    <ul class="list-disc list-inside space-y-2 text-slate-700">
+                        <li><strong>Git:</strong> Download and install from the <a href="https://git-scm.com/downloads" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">official Git website</a>.</li>
+                        <li><strong>GitHub CLI:</strong> Follow instructions on the <a href="https://cli.github.com/" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">official `gh` website</a>.</li>
+                    </ul>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-3">First-Time Configuration</h3>
+                    <p class="text-slate-600 mb-4">Run these commands in your terminal to set up your identity.</p>
+                    <div class="relative bg-slate-800 text-white p-4 rounded-md text-sm font-mono overflow-x-auto">
+                        <p class="whitespace-pre"><span class="text-green-400"># Configure your name and email</span>
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+
+<span class="text-green-400"># Set your preferred code editor (e.g., VS Code)</span>
+git config --global core.editor "code --wait"
+
+<span class="text-green-400"># Log in to GitHub</span>
+gh auth login
+
+<span class="text-green-400"># Check authentication status</span>
+gh auth status</p>
+                    </div>
+                </div>
+            </div>
+             <div class="mt-8 bg-amber-50 border-l-4 border-amber-500 text-amber-800 p-4 rounded-r-lg" role="alert">
+                <p class="font-bold">Important Note on Multiple Accounts</p>
+                <p class="mt-1">The <code class="font-mono text-amber-900 bg-amber-100 px-1.5 py-1 rounded">git config --global</code> commands set a default identity for every repository on your computer. If you use separate accounts (e.g., for work and personal projects), this global setting can cause your work commits to be linked to your personal account. See the <a href="#multiple-accounts" class="font-semibold underline hover:text-amber-900">Multiple Accounts</a> section for the correct way to manage this.</p>
+            </div>
+        </section>
+
+        <section id="concepts" class="mt-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 border-b-2 border-indigo-200 pb-2 mb-6">📜 Core Concepts</h2>
+            <p class="text-slate-600 mb-8">Understanding these fundamental concepts is key to using Git and GitHub effectively. They form the foundation of version control and collaborative development.</p>
+             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-md transition-all duration-200 hover:shadow-xl hover:-translate-y-1">
+                    <h3 class="text-lg font-bold mb-2">Repository (Repo)</h3>
+                    <p class="text-slate-600">Your project's folder, containing all files and the entire history of every change.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md transition-all duration-200 hover:shadow-xl hover:-translate-y-1">
+                    <h3 class="text-lg font-bold mb-2">Commit</h3>
+                    <p class="text-slate-600">A permanent "save point" or snapshot of your files at a specific time, with a unique ID and a message.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md transition-all duration-200 hover:shadow-xl hover:-translate-y-1">
+                    <h3 class="text-lg font-bold mb-2">Branch</h3>
+                    <p class="text-slate-600">An independent line of development, allowing you to work on features without affecting the main codebase.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md transition-all duration-200 hover:shadow-xl hover:-translate-y-1">
+                    <h3 class="text-lg font-bold mb-2">Staging Area (Index)</h3>
+                    <p class="text-slate-600">An intermediate area to gather changes for your next commit, allowing you to craft precise, atomic commits.</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md transition-all duration-200 hover:shadow-xl hover:-translate-y-1">
+                    <h3 class="text-lg font-bold mb-2">Remote</h3>
+                    <p class="text-slate-600">A version of your repository hosted elsewhere (e.g., on GitHub). `origin` is the default name.</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md transition-all duration-200 hover:shadow-xl hover:-translate-y-1">
+                    <h3 class="text-lg font-bold mb-2">HEAD</h3>
+                    <p class="text-slate-600">A pointer to the most recent commit in your current branch. It represents your current position in the project's history.</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md transition-all duration-200 hover:shadow-xl hover:-translate-y-1 col-span-1 md:col-span-2 lg:col-span-3">
+                    <h3 class="text-lg font-bold mb-2">Pull Request (PR)</h3>
+                    <p class="text-slate-600">A formal proposal to merge changes from your branch into another. It's the heart of GitHub collaboration, enabling code reviews, discussions, and automated checks.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="workflow" class="mt-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 border-b-2 border-indigo-200 pb-2 mb-6">💻 The Developer Workflows</h2>
+            <p class="text-slate-600 mb-8">This is the core of the guide, covering both the solo local workflow and the collaborative team workflow. Use the tabs below to switch between different stages of development. Click any command to see its full details and an example.</p>
+            <div id="command-container"></div>
+        </section>
+        
+        <section id="typical-workflow" class="mt-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 border-b-2 border-indigo-200 pb-2 mb-6">🔄 A Typical Feature Workflow</h2>
+            <p class="text-slate-600 mb-8">This is a step-by-step guide for a common workflow: creating a new feature on a dedicated branch and submitting it for review via a pull request.</p>
+            <div class="bg-white p-8 rounded-lg shadow-lg">
+                <ul class="space-y-8">
+                    <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">1</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Update your local repository</h4>
+                            <p class="text-slate-600 mt-1">It's generally a good idea to start a new branch with the latest origin/main branch updated.</p>
+                            <div class="relative mt-2">
+                                <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code>git pull origin main</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">2</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Create a New Branch</h4>
+                            <p class="text-slate-600 mt-1">Start by creating a new branch for your changes. This isolates your work from the main codebase.</p>
+                            <div class="relative mt-2">
+                                <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code>git checkout -b "branch_name"</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">3</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Make Your Changes</h4>
+                            <p class="text-slate-600 mt-1">Now, write your code. Modify, create, and delete files as needed to implement the new feature or fix.</p>
+                            <div class="relative mt-2">
+                                <pre class="bg-slate-100 text-slate-800 p-3 rounded-md text-sm font-mono overflow-x-auto"><code># &lt;make changes to your files&gt;</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">4</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Review Your Work</h4>
+                            <p class="text-slate-600 mt-1">Check the differences between your working directory and the last commit to see exactly what you've changed.</p>
+                            <div class="relative mt-2">
+                                <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code>git diff</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">5</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Stage Your Changes</h4>
+                            <p class="text-slate-600 mt-1">Add all the modified and new files to the staging area, preparing them for the next commit.</p>
+                            <div class="relative mt-2">
+                                <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code>git add .</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">6</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Commit Your Changes</h4>
+                            <p class="text-slate-600 mt-1">Save a snapshot of your staged changes to the local repository history with a clear, descriptive message.</p>
+                            <div class="relative mt-2">
+                                <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code>git commit -m "commit message"</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">7</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Check the History</h4>
+                            <p class="text-slate-600 mt-1">It's good practice to view the commit log to ensure your new commit is there and looks correct before pushing.</p>
+                            <div class="relative mt-2">
+                                <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code>git log --oneline --graph</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">8</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Push to the Remote</h4>
+                            <p class="text-slate-600 mt-1">Upload your branch and its commits to the remote repository on GitHub. The `-u` flag sets up tracking for future pushes.</p>
+                            <div class="relative mt-2">
+                                <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code>git push -u origin "branch_name"</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">9</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Create a Pull Request</h4>
+                            <p class="text-slate-600 mt-1">Use the GitHub CLI to open a pull request, proposing that your changes be merged into the main branch.</p>
+                            <div class="relative mt-2">
+                                <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code>gh pr create --title "Your Title" --body "A description of the changes" --assignee "@me"</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">10</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Head back to your main branch</h4>
+                            <p class="text-slate-600 mt-1">Now that the work is done, just go back to your main branch and start this workflow once again.</p>
+                            <div class="relative mt-2">
+                                <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code>git checkout main</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="conflicts" class="mt-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 border-b-2 border-indigo-200 pb-2 mb-6">🚨 Handling Merge Conflicts</h2>
+            <p class="text-slate-600 mb-8">Conflicts are a normal part of collaboration and not an error. They happen when Git can't automatically merge changes. This guide shows the standard workflow for resolving them manually.</p>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div class="flex flex-col md:flex-row gap-6 items-center">
+                    <div class="w-full md:w-1/2">
+                        <h3 class="text-xl font-semibold mb-4">The Resolution Workflow</h3>
+                        <ol class="list-decimal list-inside space-y-4">
+                            <li><strong class="font-semibold text-indigo-700">Git indicates a conflict:</strong> A <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">git pull</code> or <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">git merge</code> will fail and list the conflicted files.</li>
+                            <li><strong class="font-semibold text-indigo-700">Open the conflicted file:</strong> Look for the conflict markers: <code class="font-mono text-sm bg-slate-200 text-red-600 px-1 rounded">&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code class="font-mono text-sm bg-slate-200 text-red-600 px-1 rounded">=======</code>, <code class="font-mono text-sm bg-slate-200 text-red-600 px-1 rounded">&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>.</li>
+                            <li><strong class="font-semibold text-indigo-700">Edit the file:</strong> Manually resolve the differences and remove the conflict markers, leaving only the correct code.</li>
+                            <li><strong class="font-semibold text-indigo-700">Stage the resolved file:</strong> Run <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">git add &lt;file&gt;</code> to tell Git you've fixed it.</li>
+                            <li><strong class="font-semibold text-indigo-700">Commit the merge:</strong> Run <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">git commit</code> to finalize the merge, or <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">git rebase --continue</code> if you were rebasing.</li>
+                        </ol>
+                    </div>
+                    <div class="w-full md:w-1/2 bg-slate-800 text-white p-4 rounded-md text-sm font-mono overflow-x-auto">
+                        <p class="whitespace-pre"><span class="text-gray-400">// Example conflict in a file</span>
+
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+<span class="text-cyan-300">Your local changes are here.</span>
+=======
+<span class="text-yellow-300">The incoming remote changes are here.</span>
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; some-other-branch-name</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="advanced" class="mt-16 scroll-mt-20">
+             <h2 class="text-3xl font-bold text-slate-800 border-b-2 border-indigo-200 pb-2 mb-6">✨ Productivity & Advanced Tools</h2>
+             <p class="text-slate-600 mb-8">Master these tools and techniques to improve your efficiency, maintain a clean project history, and handle complex scenarios with confidence.</p>
+             <div id="advanced-container"></div>
+        </section>
+
+        <section id="gemini-tools" class="mt-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 border-b-2 border-indigo-200 pb-2 mb-6">🤖 AI-Powered Tools</h2>
+            <p class="text-slate-600 mb-8">Leverage the power of the Gemini API to streamline common developer tasks. These tools help you write better commit messages and understand complex commands faster.</p>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold mb-2">✨ AI Commit Message Generator</h3>
+                <p class="text-slate-600 mb-4">Describe your changes in the box below, and the AI will generate a conventional commit message for you.</p>
+                <textarea id="commit-description" class="w-full h-24 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500" placeholder="e.g., I added a new button to the homepage and fixed the bug in the login form."></textarea>
+                <button id="generate-commit-btn" class="mt-3 inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors">
+                    Generate Message
+                </button>
+                <div id="commit-output-container" class="mt-4 hidden">
+                    <h4 class="font-semibold text-slate-700">Generated Message:</h4>
+                    <div id="commit-output" class="mt-2 relative bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto">
+                        <div class="loader-container h-10 flex items-center justify-center">
+                            <div class="loader"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="multiple-accounts" class="mt-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 border-b-2 border-indigo-200 pb-2 mb-6">👤 Managing Multiple GitHub Accounts</h2>
+            <p class="text-slate-600 mb-8">For developers with separate work and personal accounts, this guide provides a robust method to manage both without conflict. It's crucial to understand there are two separate identities to manage: the <strong class="font-semibold text-slate-800">commit author</strong> (handled by <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">git</code>) and the <strong class="font-semibold text-slate-800">GitHub user</strong> performing actions like opening PRs (handled by <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">gh</code> and SSH).</p>
+            
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-4 text-slate-800">The Golden Rules: How to Avoid Mistakes</h3>
+                <ul class="list-disc list-inside space-y-2 text-slate-700 bg-slate-50 p-4 rounded-lg">
+                    <li><strong class="font-semibold">Rule #1: Always set <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">user.name</code> and <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">user.email</code> locally.</strong> For every new work repository you clone, you <span class="font-bold text-red-600">must</span> set your identity inside that repository. This overrides the global default.</li>
+                    <li><strong class="font-semibold">Rule #2: Always use the correct remote URL alias.</strong> When cloning a work repository, use the special host alias you create (e.g., <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">github.com-work</code>). This ensures Git uses the correct SSH key.</li>
+                    <li><strong class="font-semibold">Rule #3: Always check your active <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">gh</code> user.</strong> Before creating a pull request or issue with the CLI, run <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">gh auth status</code> to ensure you are acting as the correct user.</li>
+                </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md mt-8">
+                 <h3 class="text-xl font-semibold mb-2">The SSH Key Method: Step-by-Step</h3>
+                 <p class="text-slate-600 mb-6">This is the most robust way to handle multiple accounts. It involves creating a unique SSH key for each account and configuring SSH to use the correct key automatically based on the repository's remote URL.</p>
+                 <ul id="multiple-accounts-list" class="space-y-8">
+                    <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">1</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Generate a New SSH Key for Work</h4>
+                            <p class="text-slate-600 mt-1">Create a unique SSH key for your work account. When prompted, save it to a different file, like <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">~/.ssh/id_ed25519_work</code> (do not overwrite your existing personal key).</p>
+                            <div class="relative mt-2">
+                                <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code>ssh-keygen -t ed25519 -C "your.work@email.com"</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">2</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Add Key to Work GitHub Account</h4>
+                            <p class="text-slate-600 mt-1">Copy the new public key (<code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">cat ~/.ssh/id_ed25519_work.pub</code>) and add it to your work GitHub account's "SSH and GPG keys" settings.</p>
+                        </div>
+                    </li>
+                     <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">3</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Configure SSH to Use the Correct Key</h4>
+                            <p class="text-slate-600 mt-1">Create or edit your <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">~/.ssh/config</code> file to tell SSH which key to use for which host. This is the most critical step.</p>
+                            <div class="relative mt-2">
+                                <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code># Personal account (default)
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519
+
+# Work account (note the custom Host name)
+Host github.com-work
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_work</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                     <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">4</div>
+                        <div class="ml-4 flex-1">
+                             <h4 class="font-semibold text-slate-800">Clone & Configure Work Repositories</h4>
+                            <p class="text-slate-600 mt-1">When cloning a work repo, replace <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">github.com</code> with your new alias (<code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">github.com-work</code>). Then, inside the new directory, set your local user info. <strong class="text-red-600">This must be done for every work repo.</strong></p>
+                           <div class="relative mt-2">
+                                <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code># Clone using the new alias
+git clone git@github.com-work:company/project.git
+
+# Navigate into the project
+cd project
+
+# Set local user for THIS repo only
+git config user.name "Your Work Name"
+git config user.email "your.work@email.com"</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                 </ul>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-md mt-8">
+                 <h3 class="text-xl font-semibold mb-4 text-slate-800">How to Check Which Account You're Using</h3>
+                 <p class="text-slate-600 mb-6">Before you commit or push, run these checks to be sure you're using the correct identity.</p>
+                 <ul id="multiple-accounts-checks" class="space-y-8">
+                    <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">1</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Check the Commit Author (<code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">git</code>)</h4>
+                            <p class="text-slate-600 mt-1">Run this command inside a repository to see which user will author the commits. The <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">--show-origin</code> flag tells you exactly which config file (<code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">--local</code> or <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">--global</code>) is being used.</p>
+                            <div class="relative mt-2">
+                                <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code># Check which name is set for the current repo
+git config --show-origin user.name
+
+# Check which email is set
+git config --show-origin user.email</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">2</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Test the SSH Connection</h4>
+                            <p class="text-slate-600 mt-1">You can test each SSH key configuration to confirm it's authenticating with the correct GitHub account.</p>
+                             <div class="relative mt-2">
+                                <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code># Should respond with your PERSONAL username
+ssh -T git@github.com
+
+# Should respond with your WORK username
+ssh -T git@github.com-work</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">3</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Check the Active CLI User (<code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">gh</code>)</h4>
+                            <p class="text-slate-600 mt-1">The GitHub CLI is authenticated separately. Run this command to see which user is currently active for commands like <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">gh pr create</code>.</p>
+                            <div class="relative mt-2">
+                                <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code>gh auth status</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                 </ul>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-md mt-8">
+                 <h3 class="text-xl font-semibold mb-4 text-slate-800">Switching Between Accounts with <code class="font-mono text-xl text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">gh</code></h3>
+                 <p class="text-slate-600 mb-6">The SSH configuration handles <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">git</code> commands, but for <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">gh</code> commands, you need to actively switch between your logged-in accounts.</p>
+                 <ul id="multiple-accounts-switching" class="space-y-8">
+                     <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">1</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Log In to Your Second Account</h4>
+                            <p class="text-slate-600 mt-1">If you haven't already, run <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">gh auth login</code> again to add your second account. <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">gh</code> will remember both.</p>
+                        </div>
+                    </li>
+                    <li class="flex">
+                        <div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-3 py-1 rounded-full h-8 w-8 flex items-center justify-center">2</div>
+                        <div class="ml-4 flex-1">
+                            <h4 class="font-semibold text-slate-800">Switch the Active Account</h4>
+                            <p class="text-slate-600 mt-1">Use <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">gh auth switch</code> to change the active user. It will present a menu of your logged-in accounts to choose from.</p>
+                            <div class="relative mt-2">
+                                <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code># This will open an interactive prompt
+gh auth switch</code></pre>
+                            </div>
+                        </div>
+                    </li>
+                 </ul>
+            </div>
+
+        </section>
+
+        <section id="gemini-tools" class="mt-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-slate-800 border-b-2 border-indigo-200 pb-2 mb-6">✨ Bônus: Delta extension</h2>
+            <p class="text-slate-600 mb-8">While Git's built-in <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">diff</code> command is powerful, its plain text output can often feel dense and difficult to parse, especially with complex changes. Imagine having the clear, intuitive diff visualization from GitHub Desktop—with its side-by-side views, syntax highlighting, and word-level highlighting—right inside your terminal. That’s exactly what the delta extension does, allowing you to understand complex changes at a glance without ever having to switch applications..</p>
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-xl font-semibold mb-2">Learn more about <code class="font-mono text-indigo-700 bg-indigo-100 px-1.5 py-1 rounded">delta</code></h3>
+<a href="https://dandavison.github.io/delta/introduction.html" target="_blank" class="mt-3 inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors">
+    Tutorial
+</a>
+
+            </div>
+        </section>        
+
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 mt-24">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-sm text-slate-500">
+            <p>Developed by <strong><a href="https://www.linkedin.com/in/vinicius-bevilacqua/"> Vinicius Bevilacqua</a></strong></p>
+        </div>
+    </footer>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white px-5 py-3 rounded-lg shadow-xl translate-x-[120%] transform transition-transform duration-300">
+        Copied to clipboard!
+    </div>
+
+    <!-- AI Explanation Modal -->
+    <div id="explanation-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full flex flex-col max-h-[85vh]">
+            <div class="p-6 border-b flex justify-between items-center flex-shrink-0">
+                <h3 class="text-xl font-semibold">✨ AI Explanation</h3>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600">&times;</button>
+            </div>
+            <div id="modal-content" class="p-6 overflow-y-auto">
+                <div class="flex items-center justify-center h-32">
+                    <div class="loader"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const commandsData = [
+            {
+                category: "Local: Starting a Project",
+                commands: [
+                    { cmd: "gh repo create", desc: "(Recommended) Creates a new repository on GitHub and clones it locally.", example: `gh repo create my-new-project --public --clone`},
+                    { cmd: "git init", desc: "Initializes a new, empty Git repository in an existing local directory.", example: `cd existing-project\ngit init` },
+                    { cmd: "gh repo clone <repo>", desc: "Clones an existing repository from GitHub to your local machine.", example: `gh repo clone user/repo-name` }
+                ]
+            },
+            {
+                category: "Local: Making & Saving Changes",
+                commands: [
+                    { cmd: "git status", desc: "Shows the status of your repository (modified, staged, and untracked files).", tip: "Run this command often. It's your guide to what's happening." },
+                    { cmd: "git diff", desc: "Shows the exact line-by-line changes in your modified files that have not yet been staged.", tip: "Use this to review your work before staging." },
+                    { cmd: "git diff --staged", desc: "Shows the changes you have staged and are ready to be committed.", tip: "A final check before you commit." },
+                    { cmd: "git add <file>", desc: "Stages a specific file, preparing it for the next commit. Use `git add .` to stage all modified files.", example: `git add index.html\ngit add .` },
+                    { cmd: "git commit -m \"Message\"", desc: "Saves your staged changes to the repository's history. Write clear, concise commit messages!", example: `git commit -m "feat: Add user login form"` },
+                    { cmd: "git commit --amend", desc: "Modifies your most recent commit. Useful for fixing typos or adding a file you forgot.", tip: "Avoid amending commits that have already been pushed to a shared branch." },
+                    { cmd: "git log --oneline --graph", desc: "Displays the commit history in a compact, graphical way. Much easier to read than the default `git log`." }
+                ]
+            },
+            {
+                category: "Local: Using Branches",
+                commands: [
+                    { cmd: "git branch", desc: "Lists all local branches. `*` indicates your current branch." },
+                    { cmd: "git checkout <branch-name>", desc: "Switches your working directory to the specified branch.", example: `git checkout feature/new-design` },
+                    { cmd: "git checkout -b <branch-name>", desc: "(Shortcut) Creates a new branch and immediately switches to it.", example: `git checkout -b fix/bug-123` },
+                    { cmd: "git merge <branch-name>", desc: "Merges the history of the specified branch into your current branch.", tip: "Make sure your current branch is up-to-date before merging." },
+                    { cmd: "git branch -d <branch-name>", desc: "Deletes a local branch. Git will prevent you from deleting it if it hasn't been merged.", example: `git branch -d old-feature` }
+                ]
+            },
+            {
+                category: "Local: Undoing Mistakes",
+                commands: [
+                    { cmd: "git restore <file>", desc: "Discards changes in a file in your working directory, restoring it to how it was at the last commit.", example: `git restore style.css` },
+                    { cmd: "git restore --staged <file>", desc: "Unstages a file but keeps your changes. Use this if you `add`ed a file by mistake.", example: `git restore --staged config.js` },
+                    { cmd: "git revert HEAD", desc: "Creates a new commit that is the exact opposite of your last commit. This is the safe way to undo changes on a public/shared branch.", tip: "Revert is safer than reset for shared history." },
+                    { cmd: "git reset --hard HEAD~1", desc: "Moves the `HEAD` pointer back one commit, discarding all changes. 🚨 Use with extreme caution, especially on shared branches." }
+                ]
+            },
+            {
+                category: "Team: Syncing with Remote",
+                commands: [
+                    { cmd: "git fetch origin", desc: "Downloads the latest changes from the `origin` remote without merging them into your local branch. This is a safe way to see what has changed." },
+                    { cmd: "git pull origin main", desc: "Fetches the changes and immediately tries to merge them. It's a combination of `git fetch` and `git merge`." },
+                    { cmd: "git pull --rebase origin main", desc: "💡 (Better Practice!) Fetches changes and then 're-plays' your local commits on top of the remote changes. This keeps the project history linear and clean.", tip: "This helps avoid messy 'Merge branch...' commits in your log." },
+                    { cmd: "git push", desc: "Uploads your committed changes from your local branch to the remote repository." },
+                    { cmd: "git push -u origin <branch>", desc: "Use this the first time you push a new branch. The `-u` flag sets up tracking so you can just use `git push` in the future.", example: `git push -u origin feature/new-api` }
+                ]
+            },
+            {
+                category: "Team: Pull Requests with `gh`",
+                commands: [
+                    { cmd: "gh pr create", desc: "Creates a pull request on GitHub from your current branch. It's interactive and will prompt you for a title and body.", tip: "Use the `--fill` flag to use your commit messages for the PR title and body." },
+                    { cmd: "gh pr list", desc: "Lists open pull requests in the repository." },
+                    { cmd: "gh pr diff <number>", desc: "Shows the changes introduced in a specific PR.", example: `gh pr diff 123` },
+                    { cmd: "gh pr checkout <number>", desc: "Checks out a PR locally, which is fantastic for testing a colleague's code.", example: `gh pr checkout 123` },
+                    { cmd: "gh pr merge <number>", desc: "Merges a PR. You can add flags like `--squash` to combine all PR commits into one or `--rebase` to rebase and merge.", example: `gh pr merge 123 --squash` }
+                ]
+            }
+        ];
+        
+        const advancedData = [
+            {
+                title: "Temporarily Saving Work: `git stash`",
+                description: "You're in the middle of a feature, but an urgent bug fix comes in. You can't commit your unfinished work. Use `stash` to save your changes temporarily.",
+                items: [
+                    { item: "`git stash`", detail: "Saves your uncommitted (staged and unstaged) changes to a temporary 'stash'." },
+                    { item: "`git stash list`", detail: "Shows you everything you have stashed." },
+                    { item: "`git stash pop`", detail: "Applies the most recently stashed changes and removes them from the stash list." },
+                    { item: "`git stash apply`", detail: "Applies the stash but leaves it in your stash list for later use." }
+                ]
+            },
+            {
+                title: "Cleaning Up History: Interactive Rebase",
+                description: "Before creating a PR, clean up your commit history. <code>git rebase -i HEAD~3</code> opens an editor allowing you to reorder, squash, or reword the last 3 commits. This is incredibly powerful for creating a clean, understandable PR. 🚨 <strong>Never rebase commits that have already been pushed to a shared branch.</strong>",
+                items: [
+                    { item: "`p`, `pick`", detail: "Use the commit as is." },
+                    { item: "`r`, `reword`", detail: "Use the commit, but edit the commit message." },
+                    { item: "`s`, `squash`", detail: "Use the commit, but meld it into the previous commit." },
+                    { item: "`f`, `fixup`", detail: "Like 'squash', but discard this commit's log message entirely." },
+                    { item: "`d`, `drop`", detail: "Remove the commit completely." }
+                ]
+            },
+            {
+                title: "Ignoring Files: `.gitignore`",
+                description: "Create a file named <code>.gitignore</code> in your project's root to tell Git which files to ignore. This prevents sensitive data or build artifacts from being committed. You can find standard templates at <a href='https://github.com/github/gitignore' target='_blank' rel='noopener noreferrer' class='text-indigo-600 hover:underline'>github/gitignore</a>.",
+                items: [],
+                codeExample: `# Ignore dependency directories
+node_modules/
+vendor/
+
+# Ignore build output
+dist/
+build/
+
+# Ignore log and temp files
+*.log
+.DS_Store
+
+# Ignore environment variables
+.env`
+            },
+             {
+                title: "Gists and GitHub Actions with `gh`",
+                description: "Use the GitHub CLI to interact with Gists and Actions directly from your terminal, boosting your productivity.",
+                items: [
+                    { item: "`gh gist create <file(s)>`", detail: "Creates a new gist from one or more files." },
+                    { item: "`gh gist list`", detail: "Lists your 20 most recent gists." },
+                    { item: "`gh gist view <id>`", detail: "Displays a gist's content." },
+                    { item: "`gh workflow list`", detail: "Lists all workflows in the repository." },
+                    { item: "`gh run list`", detail: "Lists recent workflow runs." },
+                    { item: "`gh run watch`", detail: "Watches a run in real-time, streaming logs to your terminal." }
+                ],
+                links: [
+                    { text: "Learn more about GitHub actions here", href: "./actionsguide.html" },
+                    { text: "Learn more about GitHub Gist here", href: "./gistguide.html" }
+                ]
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const commandContainer = document.getElementById('command-container');
+            const advancedContainer = document.getElementById('advanced-container');
+            const searchInput = document.getElementById('searchInput');
+            const noResultsMessage = document.getElementById('noResultsMessage');
+            
+            // Gemini API Elements
+            const generateCommitBtn = document.getElementById('generate-commit-btn');
+            const commitDescriptionInput = document.getElementById('commit-description');
+            const commitOutputContainer = document.getElementById('commit-output-container');
+            const commitOutput = document.getElementById('commit-output');
+            const modal = document.getElementById('explanation-modal');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const modalContent = document.getElementById('modal-content');
+
+            const allCommandsForSearch = commandsData.flatMap(cat => cat.commands.map(cmd => ({...cmd, category: cat.category})));
+            
+            async function callGemini(prompt, retries = 3, delay = 1000) {
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                };
+
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const result = await response.json();
+                        if (result.candidates && result.candidates[0].content.parts[0].text) {
+                            return result.candidates[0].content.parts[0].text;
+                        } else {
+                            throw new Error('Invalid response structure from Gemini API');
+                        }
+                    } catch (error) {
+                        if (i === retries - 1) {
+                            console.error('Gemini API call failed after multiple retries:', error);
+                            return 'Sorry, there was an error contacting the AI. Please try again later.';
+                        }
+                        await new Promise(res => setTimeout(res, delay * Math.pow(2, i)));
+                    }
+                }
+            }
+            
+            function createCopyButton(textToCopy) {
+                const button = document.createElement('button');
+                button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z" /><path d="M3 5a2 2 0 012-2h1.172a2 2 0 011.414.586l1.414 1.414A2 2 0 0110.172 6H15a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm2-1a1 1 0 00-1 1v7a1 1 0 001 1h10a1 1 0 001-1V7a1 1 0 00-1-1H9.586a1 1 0 00-.707.293L7.172 4.707A1 1 0 006.464 4.414H5z" /></svg>`;
+                button.className = 'absolute top-2 right-2 text-slate-400 hover:text-white transition-colors';
+                button.title = 'Copy to clipboard';
+                button.onclick = (e) => {
+                    e.stopPropagation();
+                    const textArea = document.createElement("textarea");
+                    textArea.value = textToCopy;
+                    textArea.style.position = "fixed"; 
+                    textArea.style.left = "-9999px";
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        showToast();
+                    } catch (err) {
+                        console.error('Fallback copy failed', err);
+                    }
+                    document.body.removeChild(textArea);
+                };
+                return button;
+            }
+
+            function showToast() {
+                const toast = document.getElementById('toast');
+                toast.classList.remove('translate-x-[120%]');
+                setTimeout(() => {
+                    toast.classList.add('translate-x-[120%]');
+                }, 2000);
+            }
+
+            function createCommandCard(command) {
+                const card = document.createElement('div');
+                card.className = 'command-card bg-white rounded-lg shadow-sm cursor-pointer border border-transparent hover:border-indigo-300 transition-all';
+                card.dataset.command = command.cmd.toLowerCase();
+                card.dataset.description = command.desc.toLowerCase();
+                
+                let content = `
+                    <div class="command-card-header p-4 flex justify-between items-center">
+                        <code class="font-mono text-indigo-600 font-semibold">${command.cmd}</code>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400 transition-transform transform" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    </div>
+                    <div class="command-card-content overflow-hidden">
+                        <div class="px-4 pb-4">
+                            <p class="text-slate-600">${command.desc}</p>
+                            ${command.tip ? `<p class="mt-2 text-sm text-sky-600 bg-sky-50 p-2 rounded-md">💡 ${command.tip}</p>` : ''}
+                            ${command.example ? `
+                                <div class="mt-3 relative">
+                                    <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code class="whitespace-pre">${command.example}</code></pre>
+                                </div>`
+                            : ''}
+                            <button class="explain-btn mt-3 text-sm text-indigo-600 font-semibold hover:underline">Explain ✨</button>
+                        </div>
+                    </div>
+                `;
+                card.innerHTML = content;
+                
+                 if (command.example) {
+                    card.querySelector('.relative').appendChild(createCopyButton(command.example));
+                }
+                
+                card.querySelector('.explain-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openExplanationModal(command);
+                });
+
+                card.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('explain-btn')) return;
+                    card.classList.toggle('open');
+                    card.querySelector('.command-card-header svg').classList.toggle('rotate-180');
+                    if(card.classList.contains('open')) {
+                        card.classList.remove('shadow-sm');
+                        card.classList.add('shadow-lg');
+                    } else {
+                        card.classList.add('shadow-sm');
+                        card.classList.remove('shadow-lg');
+                    }
+                });
+                return card;
+            }
+            
+            function renderCommands() {
+                commandContainer.innerHTML = '';
+                const categories = commandsData.map(c => c.category);
+                const uniqueCategories = [...new Set(categories)];
+                
+                const tabContainer = document.createElement('div');
+                tabContainer.className = 'flex flex-wrap border-b border-gray-200 mb-6';
+                
+                uniqueCategories.forEach((category, index) => {
+                    const tabButton = document.createElement('button');
+                    tabButton.className = 'tab py-2 px-4 -mb-px border-b-2 border-transparent text-gray-500 hover:text-indigo-600 hover:border-indigo-300';
+                    tabButton.textContent = category;
+                    if (index === 0) tabButton.classList.add('active');
+                    tabButton.dataset.category = category;
+                    tabContainer.appendChild(tabButton);
+                });
+                commandContainer.appendChild(tabContainer);
+
+                const contentContainer = document.createElement('div');
+                commandContainer.appendChild(contentContainer);
+
+                function renderContentForCategory(category) {
+                    contentContainer.innerHTML = '';
+                    const categoryData = commandsData.find(c => c.category === category);
+                    if (categoryData) {
+                        const grid = document.createElement('div');
+                        grid.className = 'grid md:grid-cols-2 gap-4';
+                        categoryData.commands.forEach(command => {
+                            grid.appendChild(createCommandCard(command));
+                        });
+                        contentContainer.appendChild(grid);
+                    }
+                }
+                
+                tabContainer.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('tab')) {
+                        tabContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                        e.target.classList.add('active');
+                        renderContentForCategory(e.target.dataset.category);
+                    }
+                });
+                
+                renderContentForCategory(uniqueCategories[0]);
+            }
+
+            function renderAdvancedTopics() {
+                advancedContainer.innerHTML = '';
+                const grid = document.createElement('div');
+                grid.className = 'grid lg:grid-cols-2 gap-8';
+                advancedData.forEach(topic => {
+                    const topicEl = document.createElement('div');
+                    topicEl.className = 'bg-white p-6 rounded-lg shadow-md flex flex-col';
+                    
+                    const formatCode = (text) => text.replace(/`([^`]+)`/g, '<code class="font-mono text-indigo-600 bg-indigo-50 px-1 py-0.5 rounded-md">$1</code>');
+
+                    let itemsHtml = '';
+                    if (topic.items && topic.items.length > 0) {
+                        itemsHtml = '<ul class="mt-4 space-y-4">';
+                        topic.items.forEach(item => {
+                            itemsHtml += `<li class="flex items-start"><div class="flex-shrink-0 font-mono text-indigo-600 font-semibold text-sm bg-indigo-50 px-2 py-1 rounded-md">${item.item.replace(/`/g, '')}</div><div class="ml-4 flex-1 min-w-0 text-slate-600">${item.detail}</div></li>`;
+                        });
+                        itemsHtml += '</ul>';
+                    }
+
+                    let codeExampleHtml = '';
+                    if (topic.codeExample) {
+                        codeExampleHtml = `
+                            <div class="mt-4">
+                                <h4 class="text-sm font-semibold text-slate-600 mb-2">Example <code>.gitignore</code> file:</h4>
+                                <div class="relative">
+                                    <pre class="bg-slate-800 text-white p-3 rounded-md text-sm font-mono overflow-x-auto"><code>${topic.codeExample}</code></pre>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    let linksHtml = '';
+                    if (topic.links && topic.links.length > 0) {
+                        linksHtml = '<div class="mt-4 pt-4 border-t border-slate-200 space-y-2">';
+                        topic.links.forEach(link => {
+                            linksHtml += `<a href="${link.href}" class="text-sm text-indigo-600 hover:underline block">${link.text} &rarr;</a>`;
+                        });
+                        linksHtml += '</div>';
+                    }
+                    
+                    topicEl.innerHTML = `
+                        <div class="flex-grow">
+                            <h3 class="text-xl font-semibold mb-2">${formatCode(topic.title)}</h3>
+                            <p class="text-slate-600">${topic.description}</p>
+                            ${itemsHtml}
+                        </div>
+                        ${codeExampleHtml}
+                        ${linksHtml}
+                    `;
+                    
+                    if (topic.codeExample) {
+                        const preWrapper = topicEl.querySelector('.relative');
+                        if (preWrapper) {
+                             preWrapper.appendChild(createCopyButton(topic.codeExample));
+                        }
+                    }
+
+                    grid.appendChild(topicEl);
+                });
+                advancedContainer.appendChild(grid);
+            }
+
+            // Gemini Feature Logic
+            generateCommitBtn.addEventListener('click', async () => {
+                const description = commitDescriptionInput.value;
+                if (!description.trim()) {
+                    alert('Please enter a description of your changes.');
+                    return;
+                }
+                commitOutputContainer.style.display = 'block';
+                commitOutput.innerHTML = `<div class="flex items-center justify-center h-10"><div class="loader"></div></div>`;
+                
+                const prompt = `Act as an expert software developer. Based on the following description of code changes, generate a concise commit message following the Conventional Commits specification. The description is: "${description}". IMPORTANT: Respond with ONLY the commit message text itself, without any introductory phrases, explanations, or markdown formatting like backticks.`;
+                const result = await callGemini(prompt);
+
+                const cleanedResult = result.replace(/```/g, '').trim();
+
+                commitOutput.innerHTML = `<pre><code class="whitespace-pre-wrap">${cleanedResult}</code></pre>`;
+                commitOutput.appendChild(createCopyButton(cleanedResult));
+            });
+
+            async function openExplanationModal(command) {
+                modal.classList.remove('hidden');
+                modalContent.innerHTML = `<div class="flex items-center justify-center h-32"><div class="loader"></div></div>`;
+                
+                const prompt = `Explain the git command "${command.cmd}" which is used for "${command.desc}" in simple terms, using an analogy. Explain it like I'm a beginner. Format the output nicely with paragraphs.`;
+                const explanation = await callGemini(prompt);
+
+                modalContent.innerHTML = `<div class="prose max-w-none text-slate-700">${explanation.replace(/\n/g, '<br>')}</div>`;
+            }
+
+            closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
+            modal.addEventListener('click', (e) => {
+                if(e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                renderSearchResults(query);
+            });
+            
+             function renderSearchResults(query) {
+                const searchResultsContainer = document.getElementById('searchResults');
+                searchResultsContainer.innerHTML = '';
+
+                if (query.length < 1) {
+                    searchResultsContainer.classList.add('hidden');
+                    return;
+                }
+
+                const results = allCommandsForSearch.filter(cmd =>
+                    cmd.cmd.toLowerCase().includes(query) || cmd.desc.toLowerCase().includes(query)
+                );
+                
+                if (results.length === 0) {
+                    searchResultsContainer.classList.add('hidden');
+                    return;
+                }
+                
+                results.forEach(command => {
+                    const item = document.createElement('div');
+                    item.className = 'flex items-center justify-between p-3 hover:bg-slate-100 border-b last:border-b-0';
+                    
+                    const textContent = document.createElement('div');
+                    textContent.className = 'flex-grow cursor-pointer mr-2';
+                    textContent.innerHTML = `
+                        <div class="font-semibold font-mono text-indigo-600">${command.cmd}</div>
+                        <div class="text-sm text-slate-500">${command.desc}</div>
+                    `;
+                    textContent.onclick = () => {
+                        const commandCard = document.querySelector(`[data-command="${command.cmd.toLowerCase()}"]`);
+                        if (commandCard) {
+                            commandCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            setTimeout(() => {
+                                if (!commandCard.classList.contains('open')) {
+                                    commandCard.click();
+                                }
+                                commandCard.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2');
+                                setTimeout(() => commandCard.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2'), 2000);
+                            }, 500);
+                        }
+                        searchInput.value = '';
+                        searchResultsContainer.classList.add('hidden');
+                    };
+
+                    const copyButtonContainer = document.createElement('div');
+                    copyButtonContainer.className = 'flex-shrink-0';
+                    const copyButton = document.createElement('button');
+                    copyButton.className = 'p-2 rounded-md text-slate-400 hover:bg-slate-200 hover:text-slate-600 transition-colors';
+                    copyButton.title = 'Copy command';
+                    copyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z" /><path d="M3 5a2 2 0 012-2h1.172a2 2 0 011.414.586l1.414 1.414A2 2 0 0110.172 6H15a2 2 0 012 2v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm2-1a1 1 0 00-1 1v7a1 1 0 001 1h10a1 1 0 001-1V7a1 1 0 00-1-1H9.586a1 1 0 00-.707.293L7.172 4.707A1 1 0 006.464 4.414H5z" /></svg>`;
+                    
+                    copyButton.onclick = (e) => {
+                        e.stopPropagation();
+                        const textToCopy = command.example ? command.example.split('\n')[0] : command.cmd;
+                        const textArea = document.createElement("textarea");
+                        textArea.value = textToCopy;
+                        textArea.style.position = "fixed"; 
+                        textArea.style.left = "-9999px";
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        try {
+                            document.execCommand('copy');
+                            showToast();
+                        } catch (err) {
+                            console.error('Fallback copy failed', err);
+                        }
+                        document.body.removeChild(textArea);
+                    };
+
+                    copyButtonContainer.appendChild(copyButton)
+                    item.appendChild(textContent);
+                    item.appendChild(copyButtonContainer);
+                    searchResultsContainer.appendChild(item);
+                });
+
+                searchResultsContainer.classList.remove('hidden');
+            }
+
+
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target)) {
+                    document.getElementById('searchResults').classList.add('hidden');
+                }
+            });
+
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        document.querySelectorAll('.nav-link').forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+
+            document.querySelectorAll('main > section[id]').forEach(section => {
+                observer.observe(section);
+            });
+            
+            function addCopyButtonsToCodeBlocks() {
+                 // Add copy buttons to all code blocks in the document
+                document.querySelectorAll('.relative pre').forEach(pre => {
+                    // Check if a copy button already exists to avoid duplication
+                    if (!pre.parentElement.querySelector('button.absolute')) {
+                        const code = pre.querySelector('code').innerText;
+                        pre.parentElement.appendChild(createCopyButton(code));
+                    }
+                });
+                // Special case for the setup block which is not in a .relative container
+                 const setupBlock = document.querySelector('#setup .bg-slate-800');
+                 if(setupBlock && !setupBlock.querySelector('button.absolute')) {
+                    const code = setupBlock.innerText;
+                    setupBlock.classList.add('relative');
+                    setupBlock.appendChild(createCopyButton(code));
+                 }
+            }
+
+            renderCommands();
+            renderAdvancedTopics();
+            addCopyButtonsToCodeBlocks();
+        });
+    </script>
+</body>
+</html>
+
