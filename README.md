@@ -8,7 +8,7 @@ This repository contains a collection of interactive, single-page guides designe
 * **Copy-Paste Ready:** Code snippets and commands come with a handy "copy to clipboard" button.
 * **Fully Responsive:** Learn on any device, be it your desktop, tablet, or phone.
 * **Task-Oriented:** The guides are structured to help you find the information you need quickly.
-* **No Setup Required:** Simply open the HTML files in your browser to get started. Or checkout * **this link** - [LinkedIn](https://www.linkedin.com/in/vinicius-bevilacqua/)
+* **No Setup Required:** Simply open the live version on [GitHub Pages](https://vinibevilacqua.github.io/git-guide/), open the HTML files in your browser to get started.
 
 ## 📚 Guides Included
 
