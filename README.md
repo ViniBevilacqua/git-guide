@@ -14,7 +14,7 @@ This repository contains a collection of interactive, single-page guides designe
 
 This project currently includes the following guides:
 
-1.  **Interactive Git & GitHub Guide (`gitguide.html`)**
+1.  **Interactive Git & GitHub Guide (`index.html`)**
 
     An in-depth guide covering the complete Git and GitHub workflow. It includes:
     - Initial setup and configuration for single and multiple accounts.
@@ -42,13 +42,9 @@ This project currently includes the following guides:
 
 1.  Clone or download this repository to your local machine.
 2.  Navigate to the project directory.
-3.  Open any of the `*.html` files directly in your web browser (e.g., `gitguide.html`). 
+3.  Open any of the `*.html` files directly in your web browser (e.g., `index.html`). 
 
 That's it! You can now explore the guides interactively.
-
-## 👨‍💻 Author
-
-* **Vinicius Bevilacqua** - [LinkedIn](https://www.linkedin.com/in/vinicius-bevilacqua/)
 
 ## 📄 License
 
